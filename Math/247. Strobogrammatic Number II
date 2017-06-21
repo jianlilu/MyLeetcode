@@ -1,0 +1,52 @@
+247. Strobogrammatic Number II
+
+A strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).
+
+Find all strobogrammatic numbers that are of length = n.
+
+For example,
+Given n = 2, return ["11","69","88","96"].
+
+public class Solution {
+    public List<String> findStrobogrammatic(int n) {
+         if(n <= 0) {
+             return new ArrayList<String>();
+         }
+         int i = 0;
+         Queue<String> queue = new LinkedList<String>();
+         if(n % 2 == 1) {
+             i = 1;
+             queue.offer("0");
+             queue.offer("1");
+             queue.offer("8");
+         } else {
+             queue.offer("");
+         }
+         while(i < n) {
+             int size = queue.size();
+             for(int j = 0; j < size; j++) {
+                 String cur = queue.poll();
+                 String newS = "0" + cur + "0";
+                 queue.offer(newS);
+                 newS = "1" + cur + "1";
+                 queue.offer(newS);
+                 newS = "6" + cur + "9";
+                 queue.offer(newS);
+                 newS = "8" + cur + "8";
+                 queue.offer(newS);
+                 newS = "9" + cur + "6";
+                 queue.offer(newS);
+                 set.remove(cur);
+             }
+             i += 2;
+         }
+         List<String> res = new ArrayList<String>();
+         for(String s: queue) {
+             if(!s.equals("0") && s.charAt(0) == '0') {
+                continue;
+             }
+             res.add(s);
+         }
+         return res;
+    }
+}

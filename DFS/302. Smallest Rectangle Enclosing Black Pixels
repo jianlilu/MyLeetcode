@@ -1,0 +1,44 @@
+302. Smallest Rectangle Enclosing Black Pixels
+
+An image is represented by a binary matrix with 0 as a white pixel and 1 as a black pixel. The black pixels are connected, i.e., there is only one black region. Pixels are connected horizontally and vertically. Given the location (x, y) of one of the black pixels, return the area of the smallest (axis-aligned) rectangle that encloses all black pixels.
+
+For example, given the following image:
+
+[
+  "0010",
+  "0110",
+  "0100"
+]
+and x = 0, y = 2,
+Return 6.
+
+public class Solution {
+    public int minArea(char[][] image, int x, int y) {
+        if(image == null || image.length == 0 || image[0].length == 0 || x < 0 || y < 0) {
+            return 0;
+        }
+        int[] coordinate = new int[4];
+        coordinate[0] = 0;
+        coordinate[1] = image.length;
+        coordinate[2] = 0;
+        coordinate[3] = image[0].length;
+        dfs(image, x, y, coordinate);
+        return (coordinate[0] - coordinate[1] + 1) * (coordinate[2] - coordinate[3] + 1);
+    }
+    
+    private void dfs(char[][] image, int x, int y, int[] coordinate) {
+        if(x < 0 || x >= image.length || y < 0 || y >= image[0].length || image[x][y] != '1') {
+            return;
+        }
+        image[x][y] = '#';
+        coordinate[0] = Math.max(coordinate[0], x);
+        coordinate[1] = Math.min(coordinate[1], x);
+        coordinate[2] = Math.max(coordinate[2], y);
+        coordinate[3] = Math.min(coordinate[3], y);
+            
+        dfs(image, x - 1, y, coordinate);
+        dfs(image, x + 1, y, coordinate);
+        dfs(image, x, y - 1, coordinate);
+        dfs(image, x, y + 1, coordinate);
+    }
+}

@@ -1,0 +1,78 @@
+265. Paint House II
+
+There are a row of n houses, each house can be painted with one of the k colors. The cost of painting each house with a certain color is different. You have to paint all the houses such that no two adjacent houses have the same color.
+
+The cost of painting each house with a certain color is represented by a n x k cost matrix. For example, costs[0][0] is the cost of painting house 0 with color 0; costs[1][2] is the cost of painting house 1 with color 2, and so on... Find the minimum cost to paint all houses.
+
+Note:
+All costs are positive integers.
+
+Follow up:
+Could you solve it in O(nk) runtime?
+
+public class Solution {
+    public int minCostII(int[][] costs) {
+        if(costs == null || costs.length == 0 || costs[0].length == 0) {
+            return 0;
+        }
+        // costs[i][0] min(costs[i - 1][1: k]) + cost[i][0]
+        for(int i = 1; i < costs.length; i++) {
+            for(int j = 0; j < costs[0].length; j++) {
+                int cost = Integer.MAX_VALUE;
+                for(int k = 0; k < costs[0].length; k++) {
+                    if(k == j) {
+                        continue;
+                    }
+                    cost = Math.min(costs[i - 1][k], cost);
+                }
+                costs[i][j] = cost + costs[i][j];
+            }
+        }
+        int result = Integer.MAX_VALUE;
+        for(int i = 0; i < costs[0].length; i++) {
+            result = Math.min(result, costs[costs.length - 1][i]);
+        }
+        return result;
+    }
+}
+
+
+O(nk)
+public class Solution {
+    public int minCostII(int[][] costs) {
+        if(costs == null || costs.length == 0 || costs[0].length == 0) {
+            return 0;
+        }
+        // costs[i][0] min(costs[i - 1][1: k]) + cost[i][0]
+        for(int i = 1; i < costs.length; i++) {
+            int[] minIndex = getMin(costs, i - 1); // O(k)
+            for(int j = 0; j < costs[0].length; j++) {
+                if(j == minIndex[0]) {
+                    costs[i][j] = costs[i][j] + costs[i - 1][minIndex[1]];
+                } else {
+                    costs[i][j] = costs[i][j] + costs[i - 1][minIndex[0]];
+                }
+            }
+        }
+        int result = Integer.MAX_VALUE;
+        for(int i = 0; i < costs[0].length; i++) {
+            result = Math.min(result, costs[costs.length - 1][i]);
+        }
+        return result;
+    }
+    private static int[] getMin(int[][] costs, int row) {
+        int[] min = new int[2];
+        min[0] = costs[row][0] < costs[row][1]? 0: 1;
+        min[1] = costs[row][0] < costs[row][1]? 1: 0;
+        for(int j = 2; j < costs[0].length; j++) {
+            if(costs[row][j] <= costs[row][min[0]]) {
+                min[1] = min[0];
+                min[0] = j;
+            } else if(costs[row][j] > costs[row][min[0]] && costs[row][j] < costs[row][min[1]]) {
+                min[1] = j;
+            }
+        }
+        return min;
+    }
+}
+

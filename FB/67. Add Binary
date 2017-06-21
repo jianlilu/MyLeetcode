@@ -1,0 +1,49 @@
+67. Add Binary
+
+Given two binary strings, return their sum (also a binary string).
+
+For example,
+a = "11"
+b = "1"
+Return "100".
+
+// start from the end of two strings, add each digit and carry
+// if one string is done with traversal, add carry to the other one
+
+
+public class Solution {
+    public String addBinary(String a, String b) {
+    	if(a == null || a.length() == 0) {
+    		return b;
+    	}
+    	if(b == null || b.length() == 0) {
+    		return a;
+    	}
+    	int sum = 0;
+    	int carry = 0;
+    	int la = a.length() - 1;
+    	int lb = b.length() - 1;
+    	StringBuffer sb = new StringBuffer();
+    	while(la >= 0 && lb >= 0) {
+    		sum = (a.charAt(la) - '0') + (b.charAt(lb) - '0') + carry;
+    		sb.append(sum % 2);
+    		carry = sum / 2;
+    		la--;
+    		lb--;
+    	}
+    	int lc = la >= 0? la: lb;
+    	if(lc >= 0) {
+    		String remain = la >= 0? a: b;
+    		while(lc >= 0) {
+    			sum = remain.charAt(lc) - '0' + carry;
+    			sb.append(sum % 2);
+    			carry = sum / 2;
+    			lc--;
+    		}
+    	}
+    	if(carry == 1) {
+    		sb.append(1);
+    	}
+    	return sb.reverse().toString();
+    }
+}

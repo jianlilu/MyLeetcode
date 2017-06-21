@@ -1,0 +1,37 @@
+255. Verify Preorder Sequence in Binary Search Tree
+
+Given an array of numbers, verify whether it is the correct preorder traversal sequence of a binary search tree.
+
+You may assume each number in the sequence is unique.
+
+Follow up:
+Could you do it using only constant space complexity?
+
+public class Solution {
+    public boolean verifyPreorder(int[] preorder) {
+        if(preorder == null || preorder.length == 0) {
+            return true;
+        }
+        return validate(preorder, 0, preorder.length - 1);
+    }
+
+    private boolean validate(int[] preorder, int start, int end) {
+        if(start >= end) {
+            return true;
+        }
+        int pivot = preorder[start];
+		int rightStart = -1;
+        for(int i = start + 1; i <= end; i++) {
+            if(rightStart == -1 && preorder[i] > pivot) {
+                rightStart = i;
+            }
+            if(rightStart != -1 && preorder[i] < pivot) {
+                return false;
+            }
+        }
+    if(rightStart == -1) {
+            return validate(preorder, start + 1, end);
+        }
+        return validate(preorder, start + 1, rightStart - 1) && validate(preorder, rightStart, end);
+    }
+}

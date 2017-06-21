@@ -1,0 +1,75 @@
+248. Strobogrammatic Number III
+
+A strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).
+
+Write a function to count the total strobogrammatic numbers that exist in the range of low <= num <= high.
+
+For example,
+Given low = "50", high = "100", return 3. Because 69, 88, and 96 are three strobogrammatic numbers.
+
+Note:
+Because the range might be a large number, the low and high numbers are represented as string.
+
+public class Solution {
+    public int strobogrammaticInRange(String low, String high) {
+        String[] left = {"0", "1", "6", "8", "9"};
+        String[] right = {"0", "1", "9", "8", "6"};
+        int n1 = low.length();
+        int n2 = high.length();
+        Queue<String> odd = new LinkedList<String>();
+        Queue<String> even = new LinkedList<String>();
+        int count = 0;
+        even.offer("");
+        odd.offer("0");
+        odd.offer("1");
+        odd.offer("8");
+        if(n1 == 1) {
+            if(isValid("0", low) && isValid(high, "0")) {
+                count++;
+            }
+            if(isValid("1", low) && isValid(high, "1")) {
+                count++;
+            }
+            if(isValid("8", low) && isValid(high, "8")) {
+                count++;
+            }
+        }
+        int i = 2;
+        Queue<String> cur;
+        while(i <= n2) {
+            cur = i % 2 == 0? even: odd;
+            int size = cur.size();
+            for(int j = 0; j < size; j++) {
+                String s = cur.poll();
+                for(int k = 0; k < left.length; k++) {
+                    String newS = left[k] + s + right[k];
+                    cur.offer(newS);
+                    if(!newS.equals("0") && newS.charAt(0) == '0') {
+                        continue;
+                    }
+                    if(isValid(newS, low) && isValid(high, newS)) {
+                        count++;
+                    }
+                }
+            }
+            i++;
+        }
+        return count;
+    }
+    private boolean isValid(String high, String low) {
+        if(high.length() != low.length()) {
+            return high.length() > low.length();
+        }
+        for(int i = 0; i < high.length(); i++) {
+            if(high.charAt(i) == low.charAt(i)) {
+                continue;
+            }
+            if(high.charAt(i) > low.charAt(i)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+}

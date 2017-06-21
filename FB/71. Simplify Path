@@ -1,0 +1,45 @@
+71. Simplify Path
+
+Given an absolute path for a file (Unix-style), simplify it.
+
+For example,
+path = "/home/", => "/home"
+path = "/a/./b/../../c/", => "/c"
+
+// 归下类的话，有四种字符串：
+// 1. "/"：为目录分隔符，用来分隔两个目录。
+// 2. "."：当前目录
+// 3. ".."：上层目录
+// 4. 其他字符串：目录名
+
+public class Solution {
+    public String simplifyPath(String path) {
+        if(path == null || path.length() == 0) {
+            return path;
+        }
+        String[] array = path.split("/");
+        ArrayList<String> list = new ArrayList<String>();
+        for(int i = 0; i < array.length; i++) {
+            String s = array[i];
+            if(s.equals("") || s.equals(".")) {
+                continue;
+            } else if(s.equals("..")) {
+                if(list.size() > 0) {
+                    list.remove(list.size() - 1);
+                }
+            } else {
+                list.add(array[i]);
+            }
+        }
+        StringBuffer sb = new StringBuffer();
+        sb.append("/");
+        if(list.size() == 0) {
+            return sb.toString();
+        }
+        for(int i = 0; i < list.size(); i++) {
+            sb.append(list.get(i));
+            sb.append("/");
+        }
+        return sb.toString().substring(0, sb.length() - 1);
+    }
+}

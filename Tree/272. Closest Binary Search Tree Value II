@@ -1,0 +1,129 @@
+272. Closest Binary Search Tree Value II
+
+Given a non-empty binary search tree and a target value, find k values in the BST that are closest to the target.
+
+Note:
+Given target value is a floating point.
+You may assume k is always valid, that is: k ≤ total nodes.
+You are guaranteed to have only one unique set of k values in the BST that are closest to the target.
+Follow up:
+Assume that the BST is balanced, could you solve it in less than O(n) runtime (where n = total nodes)?
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+
+Traverse until we get k target values
+public class Solution {
+    public List<Integer> closestKValues(TreeNode root, double target, int k) {
+        /**
+         * preorder traversal
+         * 
+         */
+         List<Integer> result = new ArrayList<Integer>();
+         if(root == null || k <= 0) {
+             return result;
+         }
+         LinkedList<Integer> smaller = new LinkedList<Integer>();
+         LinkedList<Integer> bigger = new LinkedList<Integer>();
+         Stack<TreeNode> stack = new Stack<TreeNode>();
+         while(root != null || !stack.isEmpty()) {
+             while(root!= null) {
+                 stack.push(root);
+                 root = root.left;
+             }
+             TreeNode current = stack.pop();
+             
+             if((double)current.val <= target) {
+                 if(smaller.size() == k) {
+                     smaller.pollFirst();
+                 }
+                 smaller.offer(current.val);
+             } else {
+                 if(smaller.size() + bigger.size() < k) {
+                     bigger.offer(current.val);
+                 } else {
+                     if(smaller.isEmpty() || target - (double)smaller.peekFirst() <= (double)current.val - target) {
+                         break;
+                     } else {
+                         smaller.pollFirst();
+                         bigger.offer(current.val);
+                     }
+                 }
+             }
+             root = current.right;
+         }
+         
+         while(!smaller.isEmpty()) {
+             result.add(smaller.pollFirst());
+         }
+         while(!bigger.isEmpty()) {
+             result.add(bigger.pollFirst());
+         }
+        
+         return result;
+    }
+}
+
+
+
+Traverse all the nodes
+public class Solution {
+    public List<Integer> closestKValues(TreeNode root, double target, int k) {
+        /**
+         * preorder traversal
+         * 
+         */
+         List<Integer> result = new ArrayList<Integer>();
+         if(root == null || k <= 0) {
+             return result;
+         }
+         Stack<Integer> smaller = new Stack<Integer>();
+         Queue<Integer> bigger = new LinkedList<Integer>();
+         Stack<TreeNode> stack = new Stack<TreeNode>();
+         while(root != null || !stack.isEmpty()) {
+             while(root!= null) {
+                 stack.push(root);
+                 root = root.left;
+             }
+             TreeNode current = stack.pop();
+             if((double)current.val <= target) {
+                 smaller.push(current.val);
+             } else {
+                 bigger.offer(current.val);
+             }
+             root = current.right;
+         }
+         int i = 0;
+         while(i < k) {
+             if(smaller.isEmpty()) {
+                 result.add(bigger.poll());
+             } else if(bigger.isEmpty()) {
+                 result.add(smaller.pop());
+             } else if(target - (double)smaller.peek() <= (double)bigger.peek() - target) {
+                 result.add(smaller.pop());
+             } else {
+                 result.add(bigger.poll());
+             }
+             i++;
+         }
+         return result;
+    }
+}

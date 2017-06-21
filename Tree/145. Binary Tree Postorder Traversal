@@ -1,0 +1,75 @@
+145. Binary Tree Postorder Traversal
+Given a binary tree, return the postorder traversal of its nodes' values.
+
+For example:
+Given binary tree {1,#,2,3},
+   1
+    \
+     2
+    /
+   3
+return [3,2,1].
+
+Note: Recursive solution is trivial, could you do it iteratively?
+
+Iterative:
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        if(root == null) {
+            return list;
+        }
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        TreeNode prev = null;
+        while(!stack.isEmpty() || root != null) {
+            if(root != null) {
+                stack.push(root);
+                root = root.left;
+            } else {
+               TreeNode peekNode = stack.peek();
+               if(peekNode.right != null && prev != peekNode.right) {
+                   root = peekNode.right;
+               } else {
+                   list.add(stack.pop().val);
+                   prev = peekNode;
+               }
+            }
+        }
+        return list;
+    }
+}
+
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+import java.util.*
+public class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        traverse(root, list);
+        return list;
+    }
+    private void traverse(TreeNode root, ArrayList<Integer> list) {
+    	if(root == null) return;
+    	traverse(root.left);
+    	traverse(root.right);
+    	list.add(root.val);
+    }
+}

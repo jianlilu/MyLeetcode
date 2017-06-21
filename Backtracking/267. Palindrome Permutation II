@@ -1,0 +1,67 @@
+267. Palindrome Permutation II
+
+Given a string s, return all the palindromic permutations (without duplicates) of it. Return an empty list if no palindromic permutation could be form.
+
+For example:
+
+Given s = "aabb", return ["abba", "baab"].
+
+Given s = "abc", return [].
+
+public class Solution {
+    public List<String> generatePalindromes(String s) {
+        List<String> result = new ArrayList<String>();
+        if(s == null) {
+            return result;
+        }
+        int[] count = new int[256];
+        for(int i = 0; i < s.length(); i++) {
+            count[s.charAt(i)]++;
+        }
+        
+        String mid = "";
+        StringBuffer sb = new StringBuffer();
+        for(int i = 0; i < 256; i++) {
+            if(count[i] % 2 != 0 && mid != "") {
+                return result;
+            }
+            if(count[i] % 2 != 0) {
+                mid = (char)i + "";    
+                if(--count[i] > 0) {
+                    for(int j = 0; j < count[i] / 2; j++) {
+                        sb.append((char)i);
+                    }
+                }
+            } else {
+                for(int j = 0; j < count[i] / 2; j++) {
+                    sb.append((char)i);
+                }
+            }
+        }
+        Set<Integer> set = new HashSet<Integer>();
+        StringBuffer sb2 = new StringBuffer();
+        dfs(sb.toString(), result, sb2, set, mid);
+        return result;
+    }
+    
+    private void dfs(String s, List<String> result, StringBuffer current, Set<Integer> set, String mid) {
+        if(current.length() == s.length()) {
+            result.add(current.toString() + mid + current.reverse().toString());
+            current.reverse();
+            return;
+        }
+        for(int i = 0; i < s.length(); i++) {
+            if(set.contains(i)) {
+                continue;
+            }
+            if(i != 0 && s.charAt(i) == s.charAt(i - 1) && !set.contains(i - 1)) {
+                continue;
+            }
+            set.add(i);
+            current.append(s.charAt(i));
+            dfs(s, result, current, set, mid);
+            set.remove(i);
+            current.deleteCharAt(current.length() - 1);
+        }
+    }
+}

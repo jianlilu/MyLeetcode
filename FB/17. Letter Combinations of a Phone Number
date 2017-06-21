@@ -1,0 +1,37 @@
+17. Letter Combinations of a Phone Number
+
+Given a digit string, return all possible letter combinations that the number could represent.
+
+A mapping of digit to letters (just like on the telephone buttons) is given below.
+
+
+
+Input:Digit string "23"
+Output: ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"].
+
+public class Solution {
+    public List<String> letterCombinations(String digits) {
+        List<String> list = new ArrayList<String>();
+        if(digits == null || digits.length() == 0) {
+            return list;
+        }
+        String[] dictionary = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+        StringBuffer sb = new StringBuffer();
+        helper(digits, list, dictionary, sb, 0);
+        return list;
+    }
+    private void helper(String digits, List<String> list, String[] dictionary, StringBuffer sb, int start) {
+        if(start == digits.length()) {
+            list.add(new String(sb.toString()));
+            return;
+        }
+        char c = digits.charAt(start);
+        for(int i = 0; i < dictionary[c - '0'].length(); i++) {
+            sb.append(dictionary[c - '0'].charAt(i));
+            helper(digits, list, dictionary, sb, start + 1);
+            sb.deleteCharAt(sb.length() - 1);
+        }
+    }
+}
+
+

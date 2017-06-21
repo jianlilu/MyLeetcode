@@ -1,0 +1,42 @@
+215. Kth Largest Element in an Array
+
+Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+For example,
+Given [3,2,1,5,6,4] and k = 2, return 5.
+
+Note: 
+You may assume k is always valid, 1 ≤ k ≤ array's length.
+
+public class Solution {
+    public int findKthLargest(int[] nums, int k) {
+        int len = nums.length;
+          return findKthSmallest(nums, 0, len-1, len-k+1);
+      }
+      
+      public int findKthSmallest(int[] nums, int start, int end, int k) {
+          int l = start;
+          int r = end;
+         int pivot = end;
+         while (l < r) {
+             while (l<r && nums[l] < nums[pivot]) {
+                 l++;
+             }
+             while (l<r && nums[r] >= nums[pivot]) {
+                 r--;
+             }
+             if (l == r) break;
+             swap(nums, l, r);
+         }
+         swap(nums, l, pivot);
+         if (l+1 == k) return nums[l];
+         else if (l+1 < k) return findKthSmallest(nums, l+1, end, k);
+         else return findKthSmallest(nums, start, l-1, k);
+     }
+     
+     public void swap(int[] nums, int l, int r) {
+         int temp = nums[l];
+         nums[l] = nums[r];
+         nums[r] = temp;
+    }
+}

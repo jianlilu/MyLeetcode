@@ -1,0 +1,102 @@
+460. LFU Cache
+
+Design and implement a data structure for Least Frequently Used (LFU) cache. It should support the following operations: get and put.
+
+get(key) - Get the value (will always be positive) of the key if the key exists in the cache, otherwise return -1.
+put(key, value) - Set or insert the value if the key is not already present. When the cache reaches its capacity, it should invalidate the least frequently used item before inserting a new item. For the purpose of this problem, when there is a tie (i.e., two or more keys that have the same frequency), the least recently used key would be evicted.
+
+Follow up:
+Could you do both operations in O(1) time complexity?
+
+Example:
+
+LFUCache cache = new LFUCache( 2 /* capacity */ );
+
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // returns 1
+cache.put(3, 3);    // evicts key 2
+cache.get(2);       // returns -1 (not found)
+cache.get(3);       // returns 3.
+cache.put(4, 4);    // evicts key 1.
+cache.get(1);       // returns -1 (not found)
+cache.get(3);       // returns 3
+cache.get(4);       // returns 4
+
+public class LFUCache {
+    private int capacity;
+    HashMap<Integer, Integer> valueMap;
+    HashMap<Integer, Integer> freqMap;
+    HashMap<Integer, LinkedHashSet<Integer>> freqAndKeys;
+    int minFreq;
+    public LFUCache(int capacity) {
+        this.capacity = capacity;
+        valueMap = new HashMap<Integer, Integer>();
+        freqMap = new HashMap<Integer, Integer>();
+        freqAndKeys = new HashMap<Integer, LinkedHashSet<Integer>>();
+        minFreq = 0;
+    }
+    
+    public int get(int key) {
+        if(!valueMap.containsKey(key)) {
+            return -1;   
+        }
+        // update Frequency
+        updateFreq(key);
+        return valueMap.get(key);
+    }
+    
+    public void put(int key, int value) {
+        if(capacity == 0) {
+            return;
+        }
+        if(valueMap.containsKey(key)) {
+            updateFreq(key);
+            valueMap.put(key, value);
+        } else {
+            // if full, remove the least frequently used key
+            if(valueMap.size() == capacity) {
+                int firstKey = freqAndKeys.get(minFreq).iterator().next();
+                freqMap.remove(firstKey);
+                freqAndKeys.get(minFreq).remove(firstKey);
+                valueMap.remove(firstKey);
+            }
+            
+            // Add the target key and value into three maps
+            minFreq = 1;
+            freqMap.put(key, 1);
+            if(!freqAndKeys.containsKey(1)) {
+                LinkedHashSet<Integer> lhs = new LinkedHashSet<Integer>();
+                lhs.add(key);
+                freqAndKeys.put(1, lhs);
+            } else {
+                freqAndKeys.get(1).add(key);
+            }
+            valueMap.put(key, value);
+        }
+    }
+    private void updateFreq(int key) {
+        int freq = freqMap.get(key);
+        // update freqMap
+        freqMap.put(key, freq + 1);
+        // update freqAndKeys
+        freqAndKeys.get(freq).remove(key);
+        if(freq == minFreq && freqAndKeys.get(freq).size() == 0) {
+            minFreq++;
+        }
+        if(!freqAndKeys.containsKey(freq + 1)) {
+            LinkedHashSet<Integer> lhs = new LinkedHashSet<Integer>();
+            lhs.add(key);
+            freqAndKeys.put(freq + 1, lhs);
+        } else {
+            freqAndKeys.get(freq + 1).add(key);
+        }
+    }
+}
+
+/**
+ * Your LFUCache object will be instantiated and called as such:
+ * LFUCache obj = new LFUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */

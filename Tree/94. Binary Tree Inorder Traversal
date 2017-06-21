@@ -1,0 +1,93 @@
+94. Binary Tree Inorder Traversal
+Given a binary tree, return the inorder traversal of its nodes' values.
+
+For example:
+Given binary tree [1,null,2,3],
+   1
+    \
+     2
+    /
+   3
+return [1,3,2].
+
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+
+// Iterative
+public class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        if(root == null) {
+            return list;
+        }
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        while(!stack.isEmpty() || root != null) {
+            while(root != null) {
+                stack.push(root);
+                root = root.left;
+            }
+            TreeNode node = stack.pop();
+            list.add(node.val);
+            root = node.right;
+        }
+        return list;
+    }
+}
+
+
+// Recursive
+import java.util.ArrayList;
+public class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        traverse(root, list);
+        return list;
+    }
+    private void traverse(TreeNode root, ArrayList<Integer> list) {
+    	if(root == null) return;
+    	traverse(root.left, list);
+    	list.add(root.val);
+    	traverse(root.right, list);
+    }
+}
+
+// Iterative
+import java.util.ArrayList;
+import java.util.Stack;
+public class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        if(root == null) return list;
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        while(!stack.isEmpty() || root != null) {
+        	if(root != null) {
+        		stack.push(root);
+        		root = root.left;
+        	} else {
+        		root = stack.pop();
+        		list.add(root.val);
+        		root = root.right;
+        	}
+        }
+        return list;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+

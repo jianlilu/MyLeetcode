@@ -1,0 +1,65 @@
+273. Integer to English Words
+
+Convert a non-negative integer to its english words representation. Given input is guaranteed to be less than 231 - 1.
+
+For example,
+123 -> "One Hundred Twenty Three"
+12345 -> "Twelve Thousand Three Hundred Forty Five"
+1234567 -> "One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven"
+
+
+public class Solution {
+    private String[] digits = {"", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
+	private String[] teen = {"Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+    private String[] tens = {"", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+    private String[] bigs = {"", "Thousand", "Million", "Billion"};
+    public String numberToWords(int num) {
+		if(num == 0) {
+			return "Zero";
+		}
+		int count = 0;
+		List<String> list = new ArrayList<String>();
+		StringBuffer sb = new StringBuffer();
+		while(num > 0) {
+		    String s = processThreeDigits(num % 1000);
+		    if(!s.equals("")) {
+		        list.add(bigs[count]);
+		        list.add(s);
+		    }
+		    num /= 1000;
+		    count++;
+		}
+		for(int i = list.size() - 1; i >= 0; i--) {
+		    sb.append(list.get(i));
+		    sb.append(" ");
+		}
+	    return sb.toString().trim();
+    }
+		
+    private String processThreeDigits(int n) {
+    	List<String> list = new ArrayList<String>();
+		StringBuffer sb = new StringBuffer();
+    	if(n >= 100) {
+    		list.add(digits[n / 100]);
+    		list.add("Hundred");
+    		n = n % 100;
+    	}
+    	if(n <= 99 && n >= 20) {
+    		list.add(tens[n / 10]);
+    		n = n % 10;
+    	}
+    	if(n < 20 && n >= 10) {
+    		list.add(teen[n % 10]);
+    		n = n / 20;
+    	}
+    	if(n > 0) {
+    		list.add(digits[n]);
+    	}
+    	for(String s: list) {
+    	    sb.append(s);
+    	    sb.append(" ");
+    	}
+    	return sb.toString().trim();
+    }
+}
+

@@ -1,0 +1,152 @@
+305. Number of Islands II
+
+
+http://www.cnblogs.com/EdwardLiu/p/5087633.html    very good reference
+
+
+A 2d grid map of m rows and n columns is initially filled with water. We may perform an addLand operation which turns the water at position (row, col) into a land. Given a list of positions to operate, count the number of islands after each addLand operation. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+
+Example:
+
+Given m = 3, n = 3, positions = [[0,0], [0,1], [1,2], [2,1]].
+Initially, the 2d grid grid is filled with water. (Assume 0 represents water and 1 represents land).
+
+0 0 0
+0 0 0
+0 0 0
+Operation #1: addLand(0, 0) turns the water at grid[0][0] into a land.
+
+1 0 0
+0 0 0   Number of islands = 1
+0 0 0
+Operation #2: addLand(0, 1) turns the water at grid[0][1] into a land.
+
+1 1 0
+0 0 0   Number of islands = 1
+0 0 0
+Operation #3: addLand(1, 2) turns the water at grid[1][2] into a land.
+
+1 1 0
+0 0 1   Number of islands = 2
+0 0 0
+Operation #4: addLand(2, 1) turns the water at grid[2][1] into a land.
+
+1 1 0
+0 0 1   Number of islands = 3
+0 1 0
+We return the result as an array: [1, 1, 2, 3]
+
+
+
+based on quick find   
+O(M*N), where M is the number of calls of Union, and N is the size of id array, in our case N=m*n
+public class Solution {
+    public List<Integer> numIslands2(int m, int n, int[][] positions) {
+        int[][] dirs = new int[][]{{-1,0},{1,0},{0,1},{0,-1}};
+          unionFind uf = new unionFind(m*n);
+          List<Integer> res = new ArrayList<Integer>();
+          for (int[] pos : positions) {
+              int cur = pos[0]*n + pos[1];
+              uf.ids[cur] = cur;
+              uf.count++;
+             for (int[] dir : dirs) {
+                 int x = dir[0] + pos[0];
+                 int y = dir[1] + pos[1];
+                 int nb = x*n+y;
+                 if (x<0 || x>=m || y<0 || y>=n || uf.ids[nb]==-1) continue;
+                 if (uf.find(nb) != uf.find(cur)) {
+                     uf.union(nb, cur);
+                 }
+             }
+             res.add(uf.count);
+         }
+         return res;
+     }
+     
+         public class unionFind {
+             int[] ids;
+             int count;
+             public unionFind(int num) {
+                 this.ids = new int[num];
+                 Arrays.fill(ids, -1);
+                 this.count = 0;
+             }
+             public int find(int num) {
+                 return ids[num];
+             }
+             public boolean union(int n1, int n2) {
+                 int id1=ids[n1], id2=ids[n2];
+                 if (id1 != id2) {
+                     for (int i=0; i<ids.length; i++) {
+                         if (ids[i] == id2) {
+                             ids[i] = id1;
+                         }
+                     }
+                     count--;
+                     return true;
+                 }
+                 return false;
+             }
+         }
+    }
+
+
+int[][] dirs = {{0, 1}, {1, 0}, {-1, 0}, {0, -1}};
+  
+  public List<Integer> numIslands2(int m, int n, int[][] positions) {
+      List<Integer> result = new ArrayList<>();
+      if(m <= 0 || n <= 0) return result;
+  
+      int count = 0;                      // number of islands
+      int[] roots = new int[m * n];       // one island = one tree
+      Arrays.fill(roots, -1);            
+ 
+     for(int[] p : positions) {
+         int root = n * p[0] + p[1];     // assume new point is isolated island
+         roots[root] = root;             // add new island
+         count++;
+ 
+         for(int[] dir : dirs) {
+             int x = p[0] + dir[0]; 
+             int y = p[1] + dir[1];
+             int nb = n * x + y;
+             if(x < 0 || x >= m || y < 0 || y >= n || roots[nb] == -1) continue;
+ 
+             int rootNb = findIsland(roots, nb);
+             if(roots[root] != rootNb) {        // if neighbor is in another island
+                 roots[root] = rootNb;   // union two islands 
+                 root = rootNb;          // current tree root = joined tree root
+                 count--;               
+             }
+         }
+ 
+         result.add(count);
+     }
+     return result;
+ }
+ 
+ public int findIsland(int[] roots, int id) {
+     while(id != roots[id]) id = roots[id];
+     return id;
+ }
+
+
+
+
+
+3
+3
+[[0,1],[1,2],[2,1],[1,0],[0,2],[0,0],[1,1]]
+Output:
+[1,2,3,4,3,2,-1]
+Expected:
+[1,2,3,4,3,2,1]
+
+
+1, 1, 1
+1, 0, 1
+0, 1, 0
+
+
+
+

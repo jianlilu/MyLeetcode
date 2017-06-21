@@ -1,0 +1,46 @@
+282. Expression Add Operators
+
+Given a string that contains only digits 0-9 and a target value, return all possibilities to add binary operators (not unary) +, -, or * between the digits so they evaluate to the target value.
+
+Examples: 
+"123", 6 -> ["1+2+3", "1*2*3"] 
+"232", 8 -> ["2*3+2", "2+3*2"]
+"105", 5 -> ["1*0+5","10-5"]
+"00", 0 -> ["0+0", "0-0", "0*0"]
+"3456237490", 9191 -> []
+
+public class Solution {
+    public List<String> addOperators(String num, int target) {
+        List<String> list = new ArrayList<String>();
+        if(num == null || num.length() == 0) {
+            return list;
+        }
+        helper(num, target, list, "", 0, 0, 0);
+        return list;
+    }
+    private void helper(String num, int target, List<String> list, String s, long sum, long prev, int pos) {
+        if(pos == num.length() && sum == target) {
+            list.add(s);
+            return;
+        }
+        for(int i = pos + 1; i <= num.length(); i++) {
+            if(num.charAt(pos) == '0' && i > pos + 1) {
+                break;
+            }
+            String currentString = num.substring(pos, i);
+            long current = Long.parseLong(currentString);
+            if(pos == 0) {
+                helper(num, target, list, currentString, current, current, i);
+            } else {
+                // "+"
+                helper(num, target, list, s + "+" + currentString, sum + current, current, i);
+                // "-"
+                helper(num, target, list, s + "-" + currentString, sum - current, -current, i);
+                // "*"
+                helper(num, target, list, s + "*" + currentString, sum - prev + prev * current, prev * current, i);
+            }
+        }
+    }
+}
+
+ 

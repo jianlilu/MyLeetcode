@@ -1,0 +1,142 @@
+355. Design Twitter
+
+Design a simplified version of Twitter where users can post tweets, follow/unfollow another user and is able to see the 10 most recent tweets in the user's news feed. Your design should support the following methods:
+
+postTweet(userId, tweetId): Compose a new tweet.
+getNewsFeed(userId): Retrieve the 10 most recent tweet ids in the user's news feed. Each item in the news feed must be posted by users who the user followed or by the user herself. Tweets must be ordered from most recent to least recent.
+follow(followerId, followeeId): Follower follows a followee.
+unfollow(followerId, followeeId): Follower unfollows a followee.
+Example:
+
+Twitter twitter = new Twitter();
+
+// User 1 posts a new tweet (id = 5).
+twitter.postTweet(1, 5);
+
+// User 1's news feed should return a list with 1 tweet id -> [5].
+twitter.getNewsFeed(1);
+
+// User 1 follows user 2.
+twitter.follow(1, 2);
+
+// User 2 posts a new tweet (id = 6).
+twitter.postTweet(2, 6);
+
+// User 1's news feed should return a list with 2 tweet ids -> [6, 5].
+// Tweet id 6 should precede tweet id 5 because it is posted after tweet id 5.
+twitter.getNewsFeed(1);
+
+// User 1 unfollows user 2.
+twitter.unfollow(1, 2);
+
+// User 1's news feed should return a list with 1 tweet id -> [5],
+// since user 1 is no longer following user 2.
+twitter.getNewsFeed(1);
+
+public class Twitter {
+
+    /** Initialize your data structure here. */
+    private int count;
+    private HashMap<Integer, List<Integer>> userAndTweets;  // user and his tweets
+    private HashMap<Integer, Integer> tweetAndUser;   // tweet and his user
+    private HashMap<Integer, Set<Integer>> followees; // user and his followees
+    private HashMap<Integer, Integer> tweets;         // tweets and timestamp/count
+    
+    public Twitter() {
+        count = 0;
+        userAndTweets = new HashMap<Integer, List<Integer>>();
+        tweetAndUser = new HashMap<Integer, Integer>();
+        followees = new HashMap<Integer, Set<Integer>>();
+        tweets = new HashMap<Integer, Integer>();
+    }
+    
+    /** Compose a new tweet. */
+    public void postTweet(int userId, int tweetId) {
+        tweets.put(tweetId, ++count);
+        if(userAndTweets.containsKey(userId)) {
+            userAndTweets.get(userId).add(tweetId);
+        } else {
+            List<Integer> list = new ArrayList<Integer>();
+            list.add(tweetId);
+            userAndTweets.put(userId, list);
+        }
+        tweetAndUser.put(tweetId, userId);
+    }
+    
+    /** Retrieve the 10 most recent tweet ids in the user's news feed. Each item in the news feed must be posted by users who the user followed or by the user herself. Tweets must be ordered from most recent to least recent. */
+    public List<Integer> getNewsFeed(int userId) {
+        List<Integer> result = new ArrayList<Integer>();
+        // pq is sorting the tweet by its count/timestamp in decending order
+        PriorityQueue<Integer> pq = new PriorityQueue<Integer>(new Comparator<Integer>() {
+            public int compare(Integer i1, Integer i2) {
+                return tweets.get(i2) - tweets.get(i1);
+            }
+        });
+        // Merge K sorted list using heap
+        HashMap<Integer, Integer> indexMap = new HashMap<Integer, Integer>(); // user and index of his tweets
+        // if the userId has followers
+        if(followees.containsKey(userId)) {
+            Set<Integer> followeeSet = followees.get(userId);
+            for(int followeeId: followeeSet) {
+                if(!userAndTweets.containsKey(followeeId)) {
+                    continue;
+                }
+                List<Integer> followeeList = userAndTweets.get(followeeId);
+                int currentTweetId = followeeList.get(followeeList.size() - 1);
+                indexMap.put(followeeId, followeeList.size() - 1);
+                pq.offer(currentTweetId);
+            }
+        }
+        // if the userId hiself has tweets, also we need to add his tweets in the potential pool/heap
+        if(userAndTweets.containsKey(userId)) {
+            List<Integer> userList = userAndTweets.get(userId);
+            pq.offer(userList.get(userList.size() - 1));
+            indexMap.put(userId, userList.size() - 1);
+        }
+        
+        // Start sorting
+        while(result.size() < 10 && !pq.isEmpty()) {
+            int topTweetId = pq.poll();
+            result.add(topTweetId);
+            int ownerId = tweetAndUser.get(topTweetId);
+            int index = indexMap.get(ownerId);
+            if(index > 0) {
+                pq.offer(userAndTweets.get(ownerId).get(index - 1));
+                indexMap.put(ownerId, index - 1);
+            }
+        }
+        return result;
+    }
+    
+    /** Follower follows a followee. If the operation is invalid, it should be a no-op. */
+    public void follow(int followerId, int followeeId) {
+        if(followerId == followeeId) {
+            return;
+        }
+        if(!followees.containsKey(followerId)) {
+            Set<Integer> set = new HashSet<Integer>();
+            set.add(followeeId);
+            followees.put(followerId, set);
+        } else {
+            followees.get(followerId).add(followeeId);
+        }
+    }
+    
+    /** Follower unfollows a followee. If the operation is invalid, it should be a no-op. */
+    public void unfollow(int followerId, int followeeId) {
+        if(followerId == followeeId || !followees.containsKey(followerId)) {
+            return;
+        }
+        Set<Integer> set = followees.get(followerId);
+        set.remove(followeeId);
+    }
+}
+
+/**
+ * Your Twitter object will be instantiated and called as such:
+ * Twitter obj = new Twitter();
+ * obj.postTweet(userId,tweetId);
+ * List<Integer> param_2 = obj.getNewsFeed(userId);
+ * obj.follow(followerId,followeeId);
+ * obj.unfollow(followerId,followeeId);
+ */

@@ -1,0 +1,89 @@
+10. Regular Expression Matching
+
+Implement regular expression matching with support for '.' and '*'.
+
+'.' Matches any single character.
+'*' Matches zero or more of the preceding element.
+
+The matching should cover the entire input string (not partial).
+
+The function prototype should be:
+bool isMatch(const char *s, const char *p)
+
+Some examples:
+isMatch("aa","a") → false
+isMatch("aa","aa") → true
+isMatch("aaa","aa") → false
+isMatch("aa", "a*") → true
+isMatch("aa", ".*") → true
+isMatch("ab", ".*") → true
+isMatch("aab", "c*a*b") → true
+
+string1   string2
+ abc        abc*
+
+1. ＊ 0 character right before *   if string2[j - 1] == string 
+2. * represents 1 or more characters right before *
+
+public class Solution {
+    public boolean isMatch(String s, String p) {
+        if(s == null || p == null) {
+            return false;
+        }
+        boolean[][] dp = new boolean[s.length() + 1][p.length() + 1];
+        // base case:
+        dp[0][0] = true;
+        // dp[i][0] = false;
+        // dp[0][i]
+        for(int i = 1; i < dp[0].length; i++) {
+            if(p.charAt(i - 1) == '*') {
+                dp[0][i] = dp[0][i - 2];
+            }
+        }
+        // recurrence relationship
+        for(int i = 1; i < dp.length; i++) {
+            for(int j = 1; j < dp[0].length; j++) {
+                if(s.charAt(i - 1) == p.charAt(j - 1) || p.charAt(j - 1) == '.') {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else if(p.charAt(j - 1) == '*') {
+                    dp[i][j] = dp[i][j - 2];
+                    if(s.charAt(i - 1) == p.charAt(j - 2) || p.charAt(j - 2) == '.') {
+                        dp[i][j] = dp[i][j] || dp[i - 1][j];
+                    }
+                } else {
+                    dp[i][j] = false;
+                }
+            }
+        }
+        return dp[s.length()][p.length()];
+    }
+}
+
+
+Let's establish some rules. dp[i][j] returns a boolean. It tells us whether the regular expression of length i matches the word of length j.
+
+Now onto base case.
+
+dp[0][0] will always be true.
+dp[n][0], where n > 0, will always be false. Empty expressions match nothing.
+dp[0][n] can either be true for false. If the character at n is '*', dp[0][n] will match dp[0][n-2]. This is to handle the edge case where regex "abc.*" can match an empty string.
+
+Okay, now onto the recurrence relationship!!
+
+dp[i][j] = if str[i] == pattern[j] or pattern[j] == '.'
+                     dp[i][j] = dp[i-1][j-1]
+             if pattern[j] == '*'
+                     dp[i][j] = dp[i][j - 2] 
+                     also if str[i] == pattern[j-1] or pattern[j-1] == '.'
+                     dp[i][j] = dp[i][j] | dp[i-1][j] 
+So what the heck is going on? I'll break it down. It's quite simple.
+
+In the first if - if the characters match or if the pattern is a wildcard char, then reduce pattern and word by length of 1, and see if they match before. If they matched before, then adding the same character to both or a wildcard to pattern won't change the result.
+
+In the second if - when we get a '*' for our pattern, we need to check for two cases.
+
+For if the wild card matches nothing. We need to reduce our word by length of two, and see if it matches our current pattern. (ex. abb will match abbc*)
+If our current string character is equal to the previous character of our pattern, or if that previous character is a wild card character, then we can simply check if it matches with one or more of that character. We do this by reducing the length of string by 1.
+Otherwise, everything else is false.
+
+Below is the implementation. Enjoy!

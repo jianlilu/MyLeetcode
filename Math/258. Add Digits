@@ -1,0 +1,39 @@
+258. Add Digits
+
+Given a non-negative integer num, repeatedly add all its digits until the result has only one digit.
+
+For example:
+
+Given num = 38, the process is like: 3 + 8 = 11, 1 + 1 = 2. Since 2 has only one digit, return it.
+
+Follow up:
+Could you do it without any loop/recursion in O(1) runtime?
+
+
+O(n)
+public class Solution {
+    public int addDigits(int num) {
+        if(num < 10) {
+            return num;
+        }
+        while(num >= 10) {
+            int cur = 0;
+            while(num != 0) {
+                cur += num % 10;
+                num /= 10;
+            }
+            num = cur;
+        }
+        return num;
+    }
+}
+
+O(1)
+public class Solution {
+    public int addDigits(int num) {
+        if(num < 10) {
+            return num;
+        }
+        return (num - 10) % 9 + 1;
+    }
+}

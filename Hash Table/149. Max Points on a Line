@@ -1,0 +1,76 @@
+149. Max Points on a Line
+
+/**
+ * Definition for a point.
+ * class Point {
+ *     int x;
+ *     int y;
+ *     Point() { x = 0; y = 0; }
+ *     Point(int a, int b) { x = a; y = b; }
+ * }
+ */
+public class Solution {
+    public int maxPoints(Point[] points) {
+        if(points == null || points.length == 0) {
+            return 0;
+        }
+        if(points.length == 1) {
+            return 1;
+        }
+        int result = 0;
+        for(int i = 0; i < points.length; i++) {
+            int countSame = 0;
+            int max = 1;
+            HashMap<String, Integer> map = new HashMap<String, Integer>();
+            for(int j = i + 1; j < points.length; j++) {
+                if(points[i].x == points[j].x && points[i].y == points[j].y) {
+                    countSame++;
+                } else {
+                    String key = normalize(points[i], points[j]);
+                    if(map.containsKey(key)) {
+                        map.put(key, map.get(key) + 1);
+                    } else {
+                        map.put(key, 2);
+                    }
+                    max = Math.max(max, map.get(key));
+                }
+            }
+            result = Math.max(result, max + countSame);
+        }
+        return result;
+    }
+    // ax + by + c = 0  y = (a / b)x + c
+    private String normalize(Point p1, Point p2) {
+        int a = 0, b = 0;
+        double c = 0;
+        // parallel with y axis
+        if(p1.x == p2.x) { 
+            a = 1;
+            b = 0;
+            c = p1.x;
+        // parallel with x axis
+        } else if(p1.y == p2.y) {
+            a = 0;
+            b = 1;
+            c = p1.y;
+        } else {
+            a = p1.y - p2.y;
+            b = p1.x - p2.x;
+            int gcd = greatestCommonDivisor(Math.abs(a), Math.abs(b));
+            a = a / gcd;
+            b = b / gcd;
+            if(a < 0) {
+                a = -a;
+                b = -b;
+            }
+            c = p1.y - b * 1.0 / a * p1.x;
+        }
+        return a + "," + b + "," + c;
+    }
+    private int greatestCommonDivisor(int a, int b) {
+        if(b == 0) {
+            return a;
+        }
+        return greatestCommonDivisor(b, a % b);
+    }
+}
